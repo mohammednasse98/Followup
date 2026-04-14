@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مُذكِّر</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+html { background-color: #06080d; }
+
+body {
+background-color: #06080d;
+color: #f0f4ff;
+font-family: ‘Cairo’, ‘Segoe UI’, sans-serif;
+min-height: 100vh;
+width: 100%;
+}
+
+.app {
+display: flex;
+flex-direction: row-reverse;
+min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+width: 260px;
+min-width: 260px;
+background-color: #0d1117;
+border-left: 1px solid rgba(255,255,255,0.08);
+display: flex;
+flex-direction: column;
+height: 100vh;
+position: sticky;
+top: 0;
+flex-shrink: 0;
+}
+
+.logo-area {
+padding: 28px 24px 20px;
+border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.logo-mark {
+font-size: 10px;
+letter-spacing: 0.15em;
+color: #4f8fff;
+font-family: ‘JetBrains Mono’, monospace;
+margin-bottom: 5px;
+}
+
+.logo-text { font-size: 1.5rem; font-weight: 900; color: #f0f4ff; }
+
+.nav { padding: 18px 12px; flex: 1; }
+
+.nav-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 11px 14px;
+border-radius: 12px;
+cursor: pointer;
+color: #6b7a99;
+font-size: 0.88rem;
+font-weight: 600;
+margin-bottom: 4px;
+border: 1px solid transparent;
+transition: all 0.2s;
+user-select: none;
+}
+
+.nav-item:hover { color: #f0f4ff; background-color: rgba(255,255,255,0.04); }
+
+.nav-item.active {
+color: #f0f4ff;
+background-color: rgba(79,143,255,0.1);
+border-color: rgba(79,143,255,0.2);
+}
+
+.nav-badge {
+margin-right: auto;
+background-color: #4f8fff;
+color: #000;
+font-size: 10px;
+font-weight: 700;
+padding: 2px 8px;
+border-radius: 20px;
+font-family: ‘JetBrains Mono’, monospace;
+min-width: 22px;
+text-align: center;
+}
+
+.nav-badge.muted { background-color: #1a2030; color: #6b7a99; }
+
+.sidebar-footer {
+padding: 16px 12px;
+border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.stats-row {
+background-color: #111620;
+border-radius: 12px;
+padding: 14px;
+display: flex;
+justify-content: space-around;
+border: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-item { text-align: center; }
+.stat-num { display: block; font-family: ‘JetBrains Mono’, monospace; font-size: 1.25rem; font-weight: 700; }
+.stat-lbl { display: block; font-size: 9px; color: #6b7a99; margin-top: 2px; }
+
+/* ── Main ── */
+.main {
+flex: 1;
+display: flex;
+flex-direction: column;
+background-color: #06080d;
+min-width: 0;
+min-height: 100vh;
+}
+
+.topbar {
+position: sticky;
+top: 0;
+z-index: 100;
+background-color: #06080d;
+border-bottom: 1px solid rgba(255,255,255,0.07);
+padding: 0 32px;
+height: 68px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.topbar-title { font-size: 0.88rem; font-weight: 600; color: #6b7a99; }
+.topbar-title span { color: #f0f4ff; }
+
+.btn-new {
+display: flex;
+align-items: center;
+gap: 6px;
+background-color: #4f8fff;
+color: #000;
+border: none;
+padding: 10px 22px;
+border-radius: 10px;
+font-weight: 900;
+cursor: pointer;
+font-family: ‘Cairo’, sans-serif;
+font-size: 0.88rem;
+transition: opacity 0.2s;
+}
+
+.btn-new:hover { opacity: 0.85; }
+
+.menu-btn {
+display: none;
+background: none;
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 8px;
+color: #f0f4ff;
+font-size: 1rem;
+cursor: pointer;
+padding: 6px 10px;
+margin-left: 12px;
+}
+
+.content { padding: 28px 32px; flex: 1; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 16px;
+}
+
+.empty {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 300px;
+color: #6b7a99;
+gap: 10px;
+}
+
+.empty-icon { font-size: 2.5rem; opacity: 0.3; }
+
+/* ── Card ── */
+.card {
+background-color: #111620;
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 18px;
+padding: 20px;
+position: relative;
+overflow: hidden;
+animation: fadeUp 0.3s ease both;
+transition: border-color 0.2s;
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(12px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.card::before {
+content: ‘’;
+position: absolute;
+top: 0; right: 0;
+width: 3px; height: 100%;
+background-color: #4f8fff;
+border-radius: 0 18px 18px 0;
+}
+
+.card.expired { border-color: rgba(255,69,96,0.2); }
+.card.expired::before { background-color: #ff4560; }
+.card.done-card::before { background-color: #00e5a0; }
+
+.card-head {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+margin-bottom: 14px;
+}
+
+.card-date {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+color: #6b7a99;
+line-height: 1.9;
+}
+
+.badge {
+font-size: 9px;
+font-weight: 700;
+padding: 3px 9px;
+border-radius: 20px;
+font-family: ‘JetBrains Mono’, monospace;
+text-transform: uppercase;
+letter-spacing: 0.04em;
+}
+
+.b-active  { background-color: rgba(79,143,255,0.15);  color: #4f8fff; border: 1px solid rgba(79,143,255,0.3); }
+.b-expired { background-color: rgba(255,69,96,0.15);   color: #ff4560; border: 1px solid rgba(255,69,96,0.3); }
+.b-done    { background-color: rgba(0,229,160,0.12);   color: #00e5a0; border: 1px solid rgba(0,229,160,0.25);}
+
+.phones { margin-bottom: 14px; }
+
+.phone-row {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 8px 12px;
+background-color: rgba(255,255,255,0.03);
+border-radius: 8px;
+margin-bottom: 5px;
+}
+
+.phone-lbl { font-size: 9px; color: #6b7a99; font-family: ‘JetBrains Mono’, monospace; text-transform: uppercase; min-width: 36px; }
+.phone-val { font-family: ‘JetBrains Mono’, monospace; font-size: 0.9rem; font-weight: 700; color: #f0f4ff; direction: ltr; }
+
+.timer-box {
+background-color: rgba(0,0,0,0.35);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 12px;
+padding: 12px;
+margin-bottom: 14px;
+text-align: center;
+}
+
+.timer-lbl { font-size: 9px; color: #6b7a99; font-family: ‘JetBrains Mono’, monospace; letter-spacing: 0.1em; margin-bottom: 4px; }
+.timer-val { font-family: ‘JetBrains Mono’, monospace; font-size: 1.7rem; font-weight: 700; color: #f0f4ff; direction: ltr; display: block; }
+.timer-val.red { color: #ff4560; }
+
+.card-actions { display: flex; gap: 8px; }
+
+.btn-done {
+flex: 1; padding: 9px;
+border-radius: 9px;
+border: 1px solid rgba(0,229,160,0.3);
+background-color: rgba(0,229,160,0.07);
+color: #00e5a0;
+cursor: pointer;
+font-weight: 700;
+font-family: ‘Cairo’, sans-serif;
+font-size: 0.82rem;
+transition: background-color 0.2s;
+}
+
+.btn-done:hover { background-color: rgba(0,229,160,0.14); }
+
+.btn-del {
+padding: 9px 13px;
+border-radius: 9px;
+border: 1px solid rgba(255,69,96,0.25);
+background-color: rgba(255,69,96,0.06);
+color: #ff4560;
+cursor: pointer;
+font-size: 0.9rem;
+transition: background-color 0.2s;
+}
+
+.btn-del:hover { background-color: rgba(255,69,96,0.13); }
+
+/* ── Modal ── */
+.overlay {
+position: fixed; inset: 0;
+background-color: rgba(0,0,0,0.78);
+display: none;
+align-items: center; justify-content: center;
+z-index: 500;
+padding: 20px;
+}
+
+.overlay.open { display: flex; }
+
+.modal {
+background-color: #161d28;
+width: 100%; max-width: 440px;
+border-radius: 22px;
+border: 1px solid rgba(255,255,255,0.1);
+overflow: hidden;
+box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+animation: mIn 0.25s ease;
+}
+
+@keyframes mIn {
+from { opacity: 0; transform: scale(0.95) translateY(8px); }
+to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-head { padding: 22px 26px 0; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 1rem; font-weight: 700; }
+
+.modal-close {
+width: 30px; height: 30px;
+background-color: rgba(255,255,255,0.06);
+border: none; border-radius: 8px;
+color: #6b7a99; cursor: pointer; font-size: 0.85rem;
+display: flex; align-items: center; justify-content: center;
+transition: background-color 0.2s;
+}
+
+.modal-close:hover { background-color: rgba(255,255,255,0.1); color: #f0f4ff; }
+
+.modal-body { padding: 22px 26px 26px; }
+
+.day-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+.day-opt {
+border: 1px solid rgba(255,255,255,0.07);
+background-color: rgba(255,255,255,0.02);
+border-radius: 12px; padding: 12px;
+text-align: center; cursor: pointer;
+transition: all 0.2s; user-select: none;
+}
+
+.day-opt.active { border-color: #4f8fff; background-color: rgba(79,143,255,0.1); }
+
+.day-opt-lbl { font-size: 10px; color: #6b7a99; font-family: ‘JetBrains Mono’, monospace; text-transform: uppercase; letter-spacing: 0.1em; }
+.day-opt-date { display: block; font-family: ‘JetBrains Mono’, monospace; font-size: 1.1rem; font-weight: 700; color: #f0f4ff; margin-top: 4px; }
+
+.time-wrap {
+background-color: rgba(0,0,0,0.3);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 12px; margin-bottom: 14px;
+}
+
+#f-time {
+width: 100%; background: transparent; border: none;
+color: #f0f4ff; font-family: ‘JetBrains Mono’, monospace;
+font-size: 2rem; font-weight: 700; text-align: center;
+padding: 14px; cursor: pointer; direction: ltr;
+}
+
+#f-time::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.4; cursor: pointer; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+
+.field {
+background-color: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 10px; overflow: hidden;
+transition: border-color 0.2s;
+}
+
+.field:focus-within { border-color: #4f8fff; }
+
+.field label { display: block; font-size: 9px; color: #6b7a99; font-family: ‘JetBrains Mono’, monospace; text-transform: uppercase; letter-spacing: 0.1em; padding: 9px 12px 0; }
+.field input { width: 100%; background: transparent; border: none; color: #f0f4ff; font-family: ‘JetBrains Mono’, monospace; font-size: 0.92rem; font-weight: 700; padding: 3px 12px 9px; direction: ltr; }
+.field input::placeholder { color: #3a4560; font-weight: 400; }
+
+.modal-actions { display: flex; gap: 10px; }
+
+.btn-save {
+flex: 1; padding: 12px;
+background-color: #4f8fff; border: none; border-radius: 10px;
+color: #000; font-weight: 900; font-family: ‘Cairo’, sans-serif; font-size: 0.9rem;
+cursor: pointer; transition: opacity 0.2s;
+}
+
+.btn-save:hover { opacity: 0.85; }
+
+.btn-cancel {
+padding: 12px 18px; background: transparent;
+border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+color: #6b7a99; cursor: pointer; font-family: ‘Cairo’, sans-serif; font-size: 0.88rem;
+transition: all 0.2s;
+}
+
+.btn-cancel:hover { color: #f0f4ff; border-color: rgba(255,255,255,0.2); }
+
+.sb-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 190; }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+.sidebar {
+position: fixed; top: 0; right: 0; height: 100vh;
+z-index: 200; transform: translateX(100%);
+transition: transform 0.3s ease;
+}
+.sidebar.open { transform: translateX(0); }
+.sb-backdrop.show { display: block; }
+.menu-btn { display: block; }
+.topbar { padding: 0 16px; }
+.content { padding: 20px 16px; }
+}
+
+@media (max-width: 560px) {
+.grid { grid-template-columns: 1fr; }
+.field-row { grid-template-columns: 1fr; }
+.topbar-title { display: none; }
+.timer-val { font-size: 1.45rem; }
+}
+</style>
+
+</head>
+<body>
+
+<audio id="snd" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
+<div class="sb-backdrop" id="sbback" onclick="closeSB()"></div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+      <div class="logo-mark">// REMINDER</div>
+      <div class="logo-text">مُذكِّر</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" id="tab-active" onclick="setView('active')">
+        <span>📋</span>
+        <span>المواعيد الجارية</span>
+        <span class="nav-badge" id="badge-active">0</span>
+      </div>
+      <div class="nav-item" id="tab-done" onclick="setView('done')">
+        <span>✅</span>
+        <span>الأرشيف</span>
+        <span class="nav-badge muted" id="badge-done">0</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-num" id="st-total" style="color:#f0f4ff">0</span>
+          <span class="stat-lbl">إجمالي</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="st-exp" style="color:#ff4560">0</span>
+          <span class="stat-lbl">منتهي</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="st-done" style="color:#00e5a0">0</span>
+          <span class="stat-lbl">مكتمل</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="menu-btn" onclick="toggleSB()">☰</button>
+        <div class="topbar-title">لوحة التحكم / <span>المواعيد</span></div>
+      </div>
+      <button class="btn-new" onclick="openModal()">＋ حجز جديد</button>
+    </header>
+
+```
+<div class="content">
+  <div class="view active" id="v-active">
+    <div class="grid" id="grid-active"></div>
+    <div class="empty" id="emp-active" style="display:none">
+      <div class="empty-icon">🗓️</div>
+      <div style="font-size:0.9rem">لا توجد مواعيد جارية</div>
+    </div>
+  </div>
+  <div class="view" id="v-done">
+    <div class="grid" id="grid-done"></div>
+    <div class="empty" id="emp-done" style="display:none">
+      <div class="empty-icon">📦</div>
+      <div style="font-size:0.9rem">الأرشيف فارغ</div>
+    </div>
+  </div>
+</div>
+```
+
+  </main>
+</div>
+
+<!-- Modal -->
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">حجز موعد جديد</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="day-picker">
+        <div class="day-opt active" id="opt-today" onclick="selDay(0)" data-val="">
+          <div class="day-opt-lbl">اليوم</div>
+          <span class="day-opt-date" id="lbl-today">—</span>
+        </div>
+        <div class="day-opt" id="opt-tmrw" onclick="selDay(1)" data-val="">
+          <div class="day-opt-lbl">الغد</div>
+          <span class="day-opt-date" id="lbl-tmrw">—</span>
+        </div>
+      </div>
+      <div class="time-wrap"><input type="time" id="f-time"></div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-land">أرضي</label>
+          <input id="f-land" type="text" placeholder="02xxxxxxxx">
+        </div>
+        <div class="field">
+          <label for="f-mob">موبايل</label>
+          <input id="f-mob" type="text" placeholder="01xxxxxxxxx">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" onclick="save()">حفظ الموعد</button>
+        <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var data = JSON.parse(localStorage.getItem('rem_v3') || '[]');
+  var selDate = '';
+  if (Notification.permission !== 'granted') Notification.requestPermission();
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+  function fmtYMD(d) { return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+
+  function initDates() {
+    var today = new Date();
+    var tmrw  = new Date(); tmrw.setDate(today.getDate()+1);
+    var short = function(d){ return pad(d.getDate())+'/'+pad(d.getMonth()+1); };
+    document.getElementById('lbl-today').textContent = short(today);
+    document.getElementById('lbl-tmrw').textContent  = short(tmrw);
+    document.getElementById('opt-today').setAttribute('data-val', fmtYMD(today));
+    document.getElementById('opt-tmrw').setAttribute('data-val',  fmtYMD(tmrw));
+    selDate = fmtYMD(today);
+    document.getElementById('opt-today').classList.add('active');
+    document.getElementById('opt-tmrw').classList.remove('active');
+  }
+
+  function selDay(i) {
+    document.getElementById('opt-today').classList.remove('active');
+    document.getElementById('opt-tmrw').classList.remove('active');
+    var el = i===0 ? document.getElementById('opt-today') : document.getElementById('opt-tmrw');
+    el.classList.add('active');
+    selDate = el.getAttribute('data-val');
+  }
+
+  function openModal()  { initDates(); document.getElementById('overlay').classList.add('open'); }
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('f-land').value = '';
+    document.getElementById('f-mob').value  = '';
+    document.getElementById('f-time').value = '';
+  }
+
+  function save() {
+    var t = document.getElementById('f-time').value;
+    var l = document.getElementById('f-land').value.trim();
+    var m = document.getElementById('f-mob').value.trim();
+    if (!t || !l) return;
+    data.push({ id: Date.now(), land: l, mob: m, date: selDate+'T'+t+':00', status: 'active', notified: false });
+    persist(); closeModal(); render();
+  }
+
+  function finish(id) {
+    var i = data.findIndex(function(x){ return x.id==id; });
+    if (i>-1) { data[i].status='done'; persist(); render(); }
+  }
+
+  function del(id) {
+    if (!confirm('حذف هذا الموعد؟')) return;
+    data = data.filter(function(x){ return x.id!=id; });
+    persist(); render();
+  }
+
+  function persist() { localStorage.setItem('rem_v3', JSON.stringify(data)); }
+
+  function fmtTimer(ms) {
+    if (ms<=0) return '00:00:00';
+    var h=Math.floor(ms/3600000), mi=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000);
+    return [h,mi,s].map(function(v){ return pad(v); }).join(':');
+  }
+
+  function render() {
+    var gA = document.getElementById('grid-active');
+    var gD = document.getElementById('grid-done');
+    gA.innerHTML = ''; gD.innerHTML = '';
+
+    var active = data.filter(function(r){ return r.status==='active'; });
+    var done   = data.filter(function(r){ return r.status==='done'; });
+
+    active.forEach(function(r,i){ gA.appendChild(makeCard(r,i)); });
+    done.forEach(function(r,i)  { gD.appendChild(makeCard(r,i)); });
+
+    document.getElementById('emp-active').style.display = active.length ? 'none' : 'flex';
+    document.getElementById('emp-done').style.display   = done.length   ? 'none' : 'flex';
+    document.getElementById('badge-active').textContent = active.length;
+    document.getElementById('badge-done').textContent   = done.length;
+    document.getElementById('st-total').textContent     = data.length;
+    document.getElementById('st-done').textContent      = done.length;
+    document.getElementById('st-exp').textContent       = active.filter(function(r){ return new Date(r.date)<new Date(); }).length;
+  }
+
+  function makeCard(r, delay) {
+    var now=new Date(), dt=new Date(r.date), diff=dt-now;
+    var expired = diff<=0 && r.status==='active';
+    var isDone  = r.status==='done';
+
+    var card = document.createElement('div');
+    card.className = 'card'+(expired?' expired':'')+(isDone?' done-card':'');
+    card.style.animationDelay = (delay*0.05)+'s';
+
+    var bc = isDone ? 'b-done' : expired ? 'b-expired' : 'b-active';
+    var bt = isDone ? 'مكتمل'  : expired ? 'منتهي'     : 'جاري';
+
+    var ds = pad(dt.getDate())+'/'+pad(dt.getMonth()+1)+'/'+dt.getFullYear();
+    var ts = pad(dt.getHours())+':'+pad(dt.getMinutes());
+
+    var timerHTML = '';
+    if (r.status==='active') {
+      timerHTML = '<div class="timer-box">'
+        +'<div class="timer-lbl">COUNTDOWN</div>'
+        +'<span class="timer-val'+(expired?' red':'')+'" id="tmr-'+r.id+'">'+fmtTimer(diff)+'</span>'
+        +'</div>';
+    }
+
+    var doneBtn = r.status==='active'
+      ? '<button class="btn-done" onclick="finish('+r.id+')">✓ تم الحجز</button>'
+      : '';
+
+    card.innerHTML =
+      '<div class="card-head">'
+        +'<div class="card-date">📅 '+ds+'<br>🕒 '+ts+'</div>'
+        +'<span class="badge '+bc+'">'+bt+'</span>'
+      +'</div>'
+      +'<div class="phones">'
+        +(r.land?'<div class="phone-row"><span class="phone-lbl">أرضي</span><span class="phone-val">'+r.land+'</span></div>':'')
+        +(r.mob ?'<div class="phone-row"><span class="phone-lbl">موبايل</span><span class="phone-val">'+r.mob+'</span></div>':'')
+      +'</div>'
+      +timerHTML
+      +'<div class="card-actions">'+doneBtn+'<button class="btn-del" onclick="del('+r.id+')">🗑</button></div>';
+
+    return card;
+  }
+
+  function triggerAlert(item) {
+    document.getElementById('snd').play().catch(function(){});
+    if (Notification.permission==='granted') {
+      new Notification('⏰ تنبيه موعد!', { body: 'حان وقت حجز الرقم: '+item.land });
+    }
+  }
+
+  setInterval(function() {
+    var changed=false;
+    data.forEach(function(r) {
+      if (r.status!=='active') return;
+      var diff=new Date(r.date)-new Date();
+      var el=document.getElementById('tmr-'+r.id);
+      if (el) {
+        el.textContent=fmtTimer(diff);
+        if (diff<=0) {
+          el.classList.add('red');
+          if (!r.notified) { triggerAlert(r); r.notified=true; changed=true; render(); }
+        }
+      }
+    });
+    if (changed) persist();
+    document.getElementById('st-exp').textContent =
+      data.filter(function(r){ return r.status==='active'&&new Date(r.date)<new Date(); }).length;
+  }, 1000);
+
+  function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sbback').classList.toggle('show'); }
+  function closeSB()  { document.getElementById('sidebar').classList.remove('open');  document.getElementById('sbback').classList.remove('show'); }
+
+  function setView(v) {
+    document.querySelectorAll('.view').forEach(function(x){ x.classList.remove('active'); });
+    document.getElementById('v-'+v).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(x){ x.classList.remove('active'); });
+    document.getElementById('tab-'+v).classList.add('active');
+    closeSB();
+  }
+
+  initDates();
+  render();
+</script>
+
+</body>
+</html>
