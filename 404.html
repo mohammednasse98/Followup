@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مُذكِّر</title>
+<title>Follow up</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
@@ -295,6 +295,19 @@ transition: background-color 0.2s;
 
 .btn-done:hover { background-color: rgba(0,229,160,0.14); }
 
+.btn-edit {
+padding: 9px 13px;
+border-radius: 9px;
+border: 1px solid rgba(255,200,50,0.25);
+background-color: rgba(255,200,50,0.06);
+color: #ffc832;
+cursor: pointer;
+font-size: 0.85rem;
+transition: background-color 0.2s;
+}
+
+.btn-edit:hover { background-color: rgba(255,200,50,0.13); }
+
 .btn-del {
 padding: 9px 13px;
 border-radius: 9px;
@@ -395,6 +408,10 @@ transition: border-color 0.2s;
 .field label { display: block; font-size: 9px; color: #6b7a99; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.1em; padding: 9px 12px 0; }
 .field input { width: 100%; background: transparent; border: none; color: #f0f4ff; font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; font-weight: 700; padding: 3px 12px 9px; direction: ltr; }
 .field input::placeholder { color: #3a4560; font-weight: 400; }
+
+/* edit mode: hide phone fields, only show time + day */
+.modal.edit-mode .field-row { display: none; }
+.modal.edit-mode .day-picker { display: grid; }
 
 .modal-actions { display: flex; gap: 10px; }
 
@@ -520,36 +537,21 @@ transition: transform 0.3s ease;
   <aside class="sidebar" id="sidebar">
     <div class="logo-area">
       <div class="logo-mark">// REMINDER</div>
-      <div class="logo-text">مُذكِّر</div>
+      <div class="logo-text">Follow up</div>
     </div>
     <nav class="nav">
       <div class="nav-item active" id="tab-active" onclick="setView('active')">
         <span>📋</span>
-        <span>المواعيد الجارية</span>
+        <span>  will follow up</span>
         <span class="nav-badge" id="badge-active">0</span>
       </div>
       <div class="nav-item" id="tab-done" onclick="setView('done')">
         <span>✅</span>
-        <span>الأرشيف</span>
+        <span>follow up done</span>
         <span class="nav-badge muted" id="badge-done">0</span>
       </div>
     </nav>
-    <div class="sidebar-footer">
-      <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-num" id="st-total" style="color:#f0f4ff">0</span>
-          <span class="stat-lbl">إجمالي</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num" id="st-exp" style="color:#ff4560">0</span>
-          <span class="stat-lbl">منتهي</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num" id="st-done" style="color:#00e5a0">0</span>
-          <span class="stat-lbl">مكتمل</span>
-        </div>
-      </div>
-    </div>
+   
   </aside>
 
   <!-- Main -->
@@ -557,9 +559,9 @@ transition: transform 0.3s ease;
     <header class="topbar">
       <div style="display:flex;align-items:center;gap:10px;">
         <button class="menu-btn" onclick="toggleSB()">☰</button>
-        <div class="topbar-title">لوحة التحكم / <span>المواعيد</span></div>
+        <div class="topbar-title">Control Follow</div>
       </div>
-      <button class="btn-new" onclick="openModal()">＋ حجز جديد</button>
+      <button class="btn-new" onclick="openModal()">＋ Add New</button>
       <div id="notif-banner" onclick="askNotifPermission()" title="اضغط لتفعيل الإشعارات">
         🔔 فعّل الإشعارات
       </div>
@@ -586,36 +588,36 @@ transition: transform 0.3s ease;
 
 <!-- Modal -->
 <div class="overlay" id="overlay">
-  <div class="modal">
+  <div class="modal" id="modal">
     <div class="modal-head">
-      <span class="modal-title">حجز موعد جديد</span>
+      <span class="modal-title" id="modal-title"> ADD Follow Up New</span>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="day-picker">
         <div class="day-opt active" id="opt-today" onclick="selDay(0)" data-val="">
-          <div class="day-opt-lbl">اليوم</div>
+          <div class="day-opt-lbl">Today</div>
           <span class="day-opt-date" id="lbl-today">—</span>
         </div>
         <div class="day-opt" id="opt-tmrw" onclick="selDay(1)" data-val="">
-          <div class="day-opt-lbl">الغد</div>
+          <div class="day-opt-lbl">Tomorrow</div>
           <span class="day-opt-date" id="lbl-tmrw">—</span>
         </div>
       </div>
       <div class="time-wrap"><input type="time" id="f-time"></div>
       <div class="field-row">
         <div class="field">
-          <label for="f-land">أرضي</label>
+          <label for="f-land">ADSL Number</label>
           <input id="f-land" type="text" placeholder="02xxxxxxxx">
         </div>
         <div class="field">
-          <label for="f-mob">موبايل</label>
+          <label for="f-mob">Mobile Number</label>
           <input id="f-mob" type="text" placeholder="01xxxxxxxxx">
         </div>
       </div>
       <div class="modal-actions">
-        <button class="btn-save" onclick="save()">حفظ الموعد</button>
-        <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+        <button class="btn-save" id="btn-save" onclick="save()">Save</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -624,8 +626,9 @@ transition: transform 0.3s ease;
 <script>
   var data = JSON.parse(localStorage.getItem('rem_v3') || '[]');
   var selDate = '';
+  var editingId = null; // null = new, number = edit mode
 
-  // ── Audio: Web Audio API for loud beep ──────────────────────────────────
+  // ── Audio ────────────────────────────────────────────────────────────────
   var audioCtx = null;
 
   function getAudioCtx() {
@@ -636,26 +639,20 @@ transition: transform 0.3s ease;
   function playLoudBeep() {
     try {
       var ctx = getAudioCtx();
-      // Play 3 short loud beeps in sequence
       [0, 0.35, 0.7].forEach(function(startOffset) {
         var osc    = ctx.createOscillator();
         var gainNd = ctx.createGain();
         osc.connect(gainNd);
         gainNd.connect(ctx.destination);
-
-        osc.type      = 'square';          // harsher waveform = louder perceived
+        osc.type = 'square';
         osc.frequency.setValueAtTime(880, ctx.currentTime + startOffset);
-
         gainNd.gain.setValueAtTime(0, ctx.currentTime + startOffset);
         gainNd.gain.linearRampToValueAtTime(1.0, ctx.currentTime + startOffset + 0.01);
         gainNd.gain.linearRampToValueAtTime(0,   ctx.currentTime + startOffset + 0.28);
-
         osc.start(ctx.currentTime + startOffset);
         osc.stop(ctx.currentTime  + startOffset + 0.3);
       });
-    } catch(e) {
-      console.warn('Audio error:', e);
-    }
+    } catch(e) { console.warn('Audio error:', e); }
   }
 
   // ── Notifications ────────────────────────────────────────────────────────
@@ -667,17 +664,11 @@ transition: transform 0.3s ease;
   }
 
   function askNotifPermission() {
-    if (!('Notification' in window)) {
-      showToast('غير مدعوم', 'متصفحك لا يدعم الإشعارات', '⚠️');
-      return;
-    }
+    if (!('Notification' in window)) { showToast('غير مدعوم', 'متصفحك لا يدعم الإشعارات', '⚠️'); return; }
     Notification.requestPermission().then(function(perm) {
       updateBanner();
-      if (perm === 'granted') {
-        showToast('تم التفعيل!', 'ستصلك إشعارات عند حلول المواعيد', '✅');
-      } else if (perm === 'denied') {
-        showToast('محظور', 'يجب السماح يدوياً من إعدادات المتصفح', '🔕');
-      }
+      if (perm === 'granted') showToast('تم التفعيل!', 'ستصلك إشعارات عند حلول المواعيد', '✅');
+      else if (perm === 'denied') showToast('محظور', 'يجب السماح يدوياً من إعدادات المتصفح', '🔕');
     });
   }
 
@@ -698,16 +689,10 @@ transition: transform 0.3s ease;
   }
 
   function sendNotification(item) {
-    // Always show in-page toast regardless
-    showToast('⏰ حان موعدك!',
-      'أرضي: ' + item.land + (item.mob ? ' | موبايل: ' + item.mob : ''),
-      '📞');
-
-    // Try OS notification
+    showToast('⏰ حان موعدك!', 'أرضي: ' + item.land + (item.mob ? ' | موبايل: ' + item.mob : ''), '📞');
     if (!('Notification' in window)) return;
-    if (Notification.permission === 'granted') {
-      fireNotif(item);
-    } else if (Notification.permission !== 'denied') {
+    if (Notification.permission === 'granted') fireNotif(item);
+    else if (Notification.permission !== 'denied') {
       Notification.requestPermission().then(function(perm) {
         updateBanner();
         if (perm === 'granted') fireNotif(item);
@@ -726,9 +711,7 @@ transition: transform 0.3s ease;
       });
       n.onclick = function() { window.focus(); n.close(); };
       setTimeout(function() { n.close(); }, 20000);
-    } catch(e) {
-      console.warn('Notification error:', e);
-    }
+    } catch(e) { console.warn('Notification error:', e); }
   }
 
   // ── Toast ─────────────────────────────────────────────────────────────────
@@ -744,7 +727,6 @@ transition: transform 0.3s ease;
       +'</div>'
       +'<button class="toast-close" onclick="dismissToast(this.parentElement)">✕</button>';
     container.appendChild(t);
-    // auto-dismiss after 8s
     setTimeout(function() { dismissToast(t); }, 8000);
   }
 
@@ -779,26 +761,85 @@ transition: transform 0.3s ease;
     selDate = el.getAttribute('data-val');
   }
 
-  function openModal()  {
-    requestNotifPermission();   // ask permission early on user gesture
+  // ── Modal open/close ─────────────────────────────────────────────────────
+  function openModal() {
+    requestNotifPermission();
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'ADD Follow Up New  ';
+    document.getElementById('btn-save').textContent = 'Save ';
+    document.getElementById('modal').classList.remove('edit-mode');
+    document.getElementById('f-land').value = '';
+    document.getElementById('f-mob').value  = '';
+    document.getElementById('f-time').value = '';
     initDates();
+    document.getElementById('overlay').classList.add('open');
+  }
+
+  function openEditModal(id) {
+    var item = data.find(function(x){ return x.id == id; });
+    if (!item) return;
+    editingId = id;
+    document.getElementById('modal-title').textContent = 'Edit  Time';
+    document.getElementById('btn-save').textContent = 'Save Edit ';
+    document.getElementById('modal').classList.add('edit-mode');
+
+    // Init dates and pre-select the item's date
+    initDates();
+    var itemDate = item.date.substring(0, 10);
+    var today = document.getElementById('opt-today').getAttribute('data-val');
+    var tmrw  = document.getElementById('opt-tmrw').getAttribute('data-val');
+    document.getElementById('opt-today').classList.remove('active');
+    document.getElementById('opt-tmrw').classList.remove('active');
+    if (itemDate === today) {
+      document.getElementById('opt-today').classList.add('active');
+      selDate = today;
+    } else if (itemDate === tmrw) {
+      document.getElementById('opt-tmrw').classList.add('active');
+      selDate = tmrw;
+    } else {
+      // date not today/tomorrow — default to today
+      document.getElementById('opt-today').classList.add('active');
+      selDate = today;
+    }
+
+    // Pre-fill time
+    var timePart = item.date.substring(11, 16); // "HH:MM"
+    document.getElementById('f-time').value = timePart;
+
     document.getElementById('overlay').classList.add('open');
   }
 
   function closeModal() {
     document.getElementById('overlay').classList.remove('open');
+    document.getElementById('modal').classList.remove('edit-mode');
     document.getElementById('f-land').value = '';
     document.getElementById('f-mob').value  = '';
     document.getElementById('f-time').value = '';
+    editingId = null;
   }
 
+  // ── Save (new or edit) ───────────────────────────────────────────────────
   function save() {
     var t = document.getElementById('f-time').value;
-    var l = document.getElementById('f-land').value.trim();
-    var m = document.getElementById('f-mob').value.trim();
-    if (!t || !l) return;
-    data.push({ id: Date.now(), land: l, mob: m, date: selDate+'T'+t+':00', status: 'active', notified: false });
-    persist(); closeModal(); render();
+    if (!t) return;
+
+    if (editingId !== null) {
+      // Edit mode: only update date/time
+      var i = data.findIndex(function(x){ return x.id == editingId; });
+      if (i > -1) {
+        data[i].date     = selDate + 'T' + t + ':00';
+        data[i].notified = false; // reset notification so it fires again if needed
+      }
+      persist(); closeModal(); render();
+      showToast('تم التعديل', 'تم تحديث وقت الموعد بنجاح', '✏️');
+    } else {
+      // New mode
+      var l = document.getElementById('f-land').value.trim();
+      var m = document.getElementById('f-mob').value.trim();
+      if (!l) return;
+      data.push({ id: Date.now(), land: l, mob: m, date: selDate+'T'+t+':00', status: 'active', notified: false });
+      persist(); closeModal(); render();
+    }
   }
 
   function finish(id) {
@@ -828,6 +869,11 @@ transition: transform 0.3s ease;
     var active = data.filter(function(r){ return r.status==='active'; });
     var done   = data.filter(function(r){ return r.status==='done'; });
 
+    // ── Sort active by nearest date ──
+    active.sort(function(a, b){ return new Date(a.date) - new Date(b.date); });
+    // ── Sort done by most recently completed (latest date first) ──
+    done.sort(function(a, b){ return new Date(b.date) - new Date(a.date); });
+
     active.forEach(function(r,i){ gA.appendChild(makeCard(r,i)); });
     done.forEach(function(r,i)  { gD.appendChild(makeCard(r,i)); });
 
@@ -850,7 +896,7 @@ transition: transform 0.3s ease;
     card.style.animationDelay = (delay*0.05)+'s';
 
     var bc = isDone ? 'b-done' : expired ? 'b-expired' : 'b-active';
-    var bt = isDone ? 'مكتمل'  : expired ? 'منتهي'     : 'جاري';
+    var bt = isDone ? 'مكتمل'  : expired ? 'Deadline passed'     : 'Running';
 
     var ds = pad(dt.getDate())+'/'+pad(dt.getMonth()+1)+'/'+dt.getFullYear();
     var ts = pad(dt.getHours())+':'+pad(dt.getMinutes());
@@ -863,9 +909,16 @@ transition: transform 0.3s ease;
         +'</div>';
     }
 
-    var doneBtn = r.status==='active'
-      ? '<button class="btn-done" onclick="finish('+r.id+')">✓ تم الحجز</button>'
-      : '';
+    // Buttons: done + edit only for active, del always
+    var actionsHTML = '';
+    if (r.status === 'active') {
+      actionsHTML =
+        '<button class="btn-done" onclick="finish('+r.id+')">✓  Done</button>'
+        +'<button class="btn-edit" onclick="openEditModal('+r.id+')" title="تعديل الوقت">✏️</button>'
+        +'<button class="btn-del" onclick="del('+r.id+')">🗑</button>';
+    } else {
+      actionsHTML = '<button class="btn-del" style="flex:1" onclick="del('+r.id+')">🗑 حذف</button>';
+    }
 
     card.innerHTML =
       '<div class="card-head">'
@@ -873,11 +926,11 @@ transition: transform 0.3s ease;
         +'<span class="badge '+bc+'">'+bt+'</span>'
       +'</div>'
       +'<div class="phones">'
-        +(r.land?'<div class="phone-row"><span class="phone-lbl">أرضي</span><span class="phone-val">'+r.land+'</span></div>':'')
-        +(r.mob ?'<div class="phone-row"><span class="phone-lbl">موبايل</span><span class="phone-val">'+r.mob+'</span></div>':'')
+        +(r.land?'<div class="phone-row"><span class="phone-lbl">ADSL Number</span><span class="phone-val">'+r.land+'</span></div>':'')
+        +(r.mob ?'<div class="phone-row"><span class="phone-lbl">Mobile Number</span><span class="phone-val">'+r.mob+'</span></div>':'')
       +'</div>'
       +timerHTML
-      +'<div class="card-actions">'+doneBtn+'<button class="btn-del" onclick="del('+r.id+')">🗑</button></div>';
+      +'<div class="card-actions">'+actionsHTML+'</div>';
 
     return card;
   }
