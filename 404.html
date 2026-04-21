@@ -689,7 +689,7 @@ transition: transform 0.3s ease;
   }
 
   function sendNotification(item) {
-    showToast('⏰ حان موعدك!', 'أرضي: ' + item.land + (item.mob ? ' | موبايل: ' + item.mob : ''), '📞');
+    showToast('⏰ Your time has come !', 'ADSL : ' + item.land + (item.mob ? ' | Mobile : ' + item.mob : ''), '📞');
     if (!('Notification' in window)) return;
     if (Notification.permission === 'granted') fireNotif(item);
     else if (Notification.permission !== 'denied') {
@@ -702,8 +702,8 @@ transition: transform 0.3s ease;
 
   function fireNotif(item) {
     try {
-      var n = new Notification('⏰ حان موعدك!', {
-        body: 'الرقم الأرضي: ' + item.land + (item.mob ? '\nالموبايل: ' + item.mob : ''),
+      var n = new Notification('⏰ Your time has come !', {
+        body: ' ADSL: ' + item.land + (item.mob ? '\Mobile: ' + item.mob : ''),
         icon: 'https://cdn-icons-png.flaticon.com/512/747/747310.png',
         tag: 'reminder-' + item.id,
         requireInteraction: true,
