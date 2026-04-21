@@ -3,6 +3,11 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <text x="50" y="70" font-size="80" font-family="Arial, Helvetica, sans-serif" fill="white" text-anchor="middle" font-weight="700">M</text>
+    </svg>'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Follow up</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -524,10 +529,42 @@ transition: transform 0.3s ease;
   white-space: nowrap;
 }
 #notif-banner:hover { background: rgba(255,165,0,0.18); }
+ #mazola {
+            position: fixed;
+            bottom: 10px;
+            left: 20px;
+            width: 200px;
+            text-align: center;
+            background: linear-gradient(45deg, #6f0779, #000000);
+            color: #fff;
+            font-weight: bold;
+            font-size: 20px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            font-family: "Cairo", Arial, sans-serif;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
 </style>
 
 </head>
 <body>
+    <div id="mazola">Mazola 😎🎶</div>
+
 
 <div id="toast-container"></div>
 <div class="sb-backdrop" id="sbback" onclick="closeSB()"></div>
@@ -689,7 +726,7 @@ transition: transform 0.3s ease;
   }
 
   function sendNotification(item) {
-    showToast('⏰ Your time has come !', 'ADSL : ' + item.land + (item.mob ? ' | Mobile : ' + item.mob : ''), '📞');
+    showToast('⏰ حان موعدك!', 'أرضي: ' + item.land + (item.mob ? ' | موبايل: ' + item.mob : ''), '📞');
     if (!('Notification' in window)) return;
     if (Notification.permission === 'granted') fireNotif(item);
     else if (Notification.permission !== 'denied') {
@@ -702,8 +739,8 @@ transition: transform 0.3s ease;
 
   function fireNotif(item) {
     try {
-      var n = new Notification('⏰ Your time has come !', {
-        body: ' ADSL: ' + item.land + (item.mob ? '\Mobile: ' + item.mob : ''),
+      var n = new Notification('⏰ حان موعدك!', {
+        body: 'الرقم الأرضي: ' + item.land + (item.mob ? '\nالموبايل: ' + item.mob : ''),
         icon: 'https://cdn-icons-png.flaticon.com/512/747/747310.png',
         tag: 'reminder-' + item.id,
         requireInteraction: true,
@@ -927,7 +964,7 @@ transition: transform 0.3s ease;
       +'</div>'
       +'<div class="phones">'
         +(r.land?'<div class="phone-row"><span class="phone-lbl">ADSL Number</span><span class="phone-val">'+r.land+'</span></div>':'')
-        +(r.mob ?'<div class="phone-row"><span class="phone-lbl">Mobile Number</span><span class="phone-val">'+r.mob+'</span></div>':'')
+        +(r.mob ?'<div class="phone-row"><span class="phone-lbl">موبايل</span><span class="phone-val">'+r.mob+'</span></div>':'')
       +'</div>'
       +timerHTML
       +'<div class="card-actions">'+actionsHTML+'</div>';
